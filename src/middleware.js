@@ -7,7 +7,7 @@
 import { NextResponse } from "next/server";
 
 export function middleware() {
-  console.log("next mw");
+  // console.log("next mw");
   // retrieve the current response
   const res = NextResponse.next();
 
