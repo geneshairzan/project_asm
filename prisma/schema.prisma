@@ -10,9 +10,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Organization {
+  id       String  @id @default(cuid())
+  name     String
+  desc     String?
+  owner_id String
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
+
+  Member      UserOrganization[]
+  Product     Product[]
+  SubCategory SubCategory[]
+  // Owner       User               @relation(fields: [owner_id], references: [id])
+  User        User[]
+  Brand       Brand[]
+  Location    Location[]
+  Category    Category[]
+  Project     Project[]
+  Status      Status[]
+}
+
 model Status {
-  id   Int    @id @default(autoincrement())
-  name String
+  id              Int     @id @default(autoincrement())
+  name            String
+  organization_id String?
 
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
@@ -24,38 +47,31 @@ model Status {
   Project         Project[]
   SubCategory     SubCategory[]
   ProjectTask     ProjectTask[]
-}
-
-model Organization {
-  id   Int     @id @default(autoincrement())
-  name String
-  desc String?
-
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now()) @updatedAt
-  deleted_at DateTime?
-
-  UserOrganization UserOrganization[]
-  Product          Product[]
+  organization    Organization? @relation(fields: [organization_id], references: [id])
 }
 
 model Brand {
-  id   Int     @id @default(autoincrement())
-  name String
-  desc String?
+  id              Int     @id @default(autoincrement())
+  name            String
+  desc            String?
+  organization_id String?
 
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
 
-  Product Product[]
+  product      Product[]
+  organization Organization? @relation(fields: [organization_id], references: [id])
 }
 
 model Location {
-  id      Int       @id @default(autoincrement())
-  name    String
-  desc    String?
-  Product Product[]
+  id              Int     @id @default(autoincrement())
+  name            String
+  desc            String?
+  organization_id String?
+
+  product      Product[]
+  organization Organization? @relation(fields: [organization_id], references: [id])
 }
 
 model UserRole {
@@ -65,63 +81,69 @@ model UserRole {
 }
 
 model User {
-  id        String  @id @default(cuid())
-  email     String? @unique
-  name      String?
-  password  String?
-  address   String?
-  token     String?
-  role_id   Int?    @default(2)
-  status_id Int     @default(1)
+  id                  String  @id @default(cuid())
+  email               String? @unique
+  name                String?
+  password            String?
+  address             String?
+  token               String?
+  role_id             Int?    @default(2)
+  status_id           Int     @default(1)
+  active_organization String?
 
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
 
-  role         UserRole?          @relation(fields: [role_id], references: [id])
-  status       Status             @relation(fields: [status_id], references: [id])
-  organization UserOrganization[]
-  ProjectTask  ProjectTask[]
+  role               UserRole?          @relation(fields: [role_id], references: [id])
+  status             Status             @relation(fields: [status_id], references: [id])
+  organizations      UserOrganization[]
+  activeorganization Organization?      @relation(fields: [active_organization], references: [id])
+  projecttask        ProjectTask[]
+  // OwnerOf             Organization[]
 }
 
 model UserOrganization {
   id              Int    @id @default(autoincrement())
   user_id         String
-  organization_id Int
-  brandId         Int?
+  organization_id String
 
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
 
-  user         User         @relation(fields: [user_id], references: [id])
-  organization Organization @relation(fields: [organization_id], references: [id])
+  user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
 }
 
 model Category {
-  id        Int     @id @default(autoincrement())
-  name      String?
-  status_id Int?    @default(1)
+  id              Int     @id @default(autoincrement())
+  name            String?
+  status_id       Int?    @default(1)
+  organization_id String?
 
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
 
-  status  Status?   @relation(fields: [status_id], references: [id])
-  Product Product[]
+  status       Status?       @relation(fields: [status_id], references: [id])
+  product      Product[]
+  organization Organization? @relation(fields: [organization_id], references: [id])
 }
 
 model SubCategory {
-  id        Int     @id @default(autoincrement())
-  name      String?
-  status_id Int?    @default(1)
+  id              Int     @id @default(autoincrement())
+  name            String?
+  status_id       Int?    @default(1)
+  organization_id String?
 
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
 
-  status  Status?   @relation(fields: [status_id], references: [id])
-  Product Product[]
+  status       Status?       @relation(fields: [status_id], references: [id])
+  product      Product[]
+  organization Organization? @relation(fields: [organization_id], references: [id])
 }
 
 model Product {
@@ -132,7 +154,7 @@ model Product {
   category_id     Int?
   sub_category_id Int?
   status_id       Int?    @default(1)
-  organization_id Int?
+  organization_id String?
   location_id     Int?
   brand_id        Int?
   quantity        Int?    @default(1)
@@ -150,10 +172,11 @@ model Product {
 }
 
 model Project {
-  id        String  @id @default(cuid())
-  name      String?
-  desc      String  @db.Text
-  status_id Int?    @default(1)
+  id              String  @id @default(cuid())
+  name            String?
+  desc            String  @db.Text
+  status_id       Int?    @default(1)
+  organization_id String?
 
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
@@ -162,8 +185,9 @@ model Project {
   status Status? @relation(fields: [status_id], references: [id])
 
   projectreference ProjectReference[]
-  ProjectFeedBAck  ProjectFeedback[]
-  ProjectTask      ProjectTask[]
+  projectFeedBAck  ProjectFeedback[]
+  projectTask      ProjectTask[]
+  organization     Organization?      @relation(fields: [organization_id], references: [id])
 }
 
 model ProjectReference {

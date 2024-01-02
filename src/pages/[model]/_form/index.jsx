@@ -72,7 +72,7 @@ export default function Main({ refdata }) {
     if (modelInfo?.form?.include_field?.includes(d?.name)) {
       return true;
     }
-    let hidden = ["id", "deleted_at", "created_at", "updated_at"];
+    let hidden = ["id", "deleted_at", "created_at", "updated_at", "organization_id"];
     if (hidden.includes(d.name) || d.kind == "object" || d.deleted_at) {
       return false;
     }

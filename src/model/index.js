@@ -1,3 +1,4 @@
+import { user } from "./user";
 import { product } from "./product";
 import { project } from "./project";
 import { projectfeedback } from "./projectfeedback";
@@ -31,7 +32,7 @@ function getDefault(target) {
 }
 
 export function getInfo(model, target) {
-  const lib = { product, project, projectreference, subcategory, projectfeedback, projecttask, status };
+  const lib = { user, product, project, projectreference, subcategory, projectfeedback, projecttask, status };
 
   return target ? lib?.[model]?.[target] || getDefault(target) : lib?.[model];
 }

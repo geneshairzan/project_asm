@@ -67,6 +67,7 @@ async function find(model, id) {
 async function where(model, where = {}) {
   return await prisma[getschemaname(model)].findUnique({
     where: where,
+    include: getInfo(model, "includes") || {},
   });
 }
 

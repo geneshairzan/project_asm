@@ -9,9 +9,9 @@ const handler = async (r, res) => {
   if (r.method == "POST") {
     let data;
     if (Array.isArray(r?.body)) {
-      data = await prisma.manyUpsert(r.query.model, r?.body);
+      data = await prisma.manyUpsert(r.query.model, { ...r?.body, organization_id: r?.auth?.active_organization });
     } else {
-      data = await prisma.set(r.query.model, r?.body);
+      data = await prisma.set(r.query.model, { ...r?.body, organization_id: r?.auth?.active_organization });
     }
 
     res.status(200).json(prisma.responseFilter(data));
@@ -22,7 +22,8 @@ const handler = async (r, res) => {
 
     res.status(200).json(r.body);
   } else {
-    let data = await prisma.get(r.query.model);
+    console.log(r?.auth?.active_organization);
+    let data = await prisma.get(r.query.model, { organization_id: r?.auth?.active_organization });
     res.status(200).json(prisma.responseFilter(data));
   }
 };

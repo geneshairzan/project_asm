@@ -34,8 +34,6 @@ export default function App(props) {
     }
   }
 
-  console.log(data?.get());
-
   return (
     <Stack flexGrow={1} overflow="auto" spacing={2} pr={5}>
       <UI.Stack flexGrow={1}>

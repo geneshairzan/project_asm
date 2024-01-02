@@ -1,7 +1,10 @@
+import React, { useEffect } from "react";
+
 import { useRouter } from "next/router";
 import { redirect } from "next/navigation";
 import P404 from "../../pages/404";
 import { nav, extra } from "@/component/app/_nav";
+import Context from "@context/app";
 
 function navReducer(a, b) {
   let tmp = b.path ? [b.path] : b.child.reduce(navReducer, []);
@@ -9,6 +12,7 @@ function navReducer(a, b) {
 }
 
 export default function AppMiddleware({ children }) {
+  const { auth } = React.useContext(Context);
   const router = useRouter();
   const allowedModel = [...nav, ...extra].reduce(navReducer, []);
 
@@ -24,8 +28,13 @@ export default function AppMiddleware({ children }) {
     return false;
   }
 
+  useEffect(() => {
+    if (auth?.user?.id && !auth?.user.activeorganization) router.push("/organization/init");
+  }, [auth?.user]);
+
   if (!isAllowed()) {
     return <P404 />;
   }
+
   return <>{children}</>;
 }

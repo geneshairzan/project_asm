@@ -9,7 +9,8 @@ export default async function handler(r, res) {
 
     try {
       let decode = await enc.checkToken(token);
-      return res.status(200).json(prisma.responseFilter(decode));
+      let user = await prisma.where("user", { id: decode?.id });
+      return res.status(200).json(prisma.responseFilter({ ...user, token: await enc.getToken(user) }));
     } catch (error) {
       return res.status(500).json("un autorized");
     }

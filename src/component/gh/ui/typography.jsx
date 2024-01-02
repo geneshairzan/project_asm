@@ -12,7 +12,7 @@ export default function Typo({ capitalize = false, bold, italic, ...props }) {
       textTransform={capitalize && "capitalize"}
       sx={{
         ...props?.sx,
-        color: props.children == "unknown" && "error.main",
+        color: props.children == "unknown" ? "error.main" : props?.color,
       }}
     >
       {props.children}

@@ -52,13 +52,13 @@ export default function App({ grey = false, auth, extraMenu }) {
                 </UI.Text>
               </UI.Col>
 
-              <UI.Col alignItems="flex-end">
+              <UI.Col alignItems="flex-end" flexGrow={1}>
                 <UI.Text variant="body1">Hi, {auth?.user?.name}</UI.Text>
                 <UI.Text variant="body2" color="grey">
                   {auth?.user?.email}
                 </UI.Text>
-                <UI.Text variant="body2" color="primary">
-                  {auth?.user?.role_name}
+                <UI.Text variant="body2" color="primary" align="right">
+                  {auth?.user?.activeorganization?.name}
                 </UI.Text>
               </UI.Col>
             </UI.Row>

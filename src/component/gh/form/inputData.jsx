@@ -14,6 +14,7 @@ export default function InputData({ dataId, url, noLabel = false, grow, ...props
   async function fetchData() {
     let res = await fetcher({
       url: url.replaceAll("_", ""),
+
       method: "get",
     });
     res?.data && setDatas(res?.data);
